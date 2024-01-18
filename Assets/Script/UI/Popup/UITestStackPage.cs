@@ -14,7 +14,7 @@ namespace UIContent
         void Awake()
         {
             RegistAllButtonOnClickEvent();
-            _titleText = GetText("Text_Title", true);
+            _titleText = GetTMPText("Text_Title");
         }
 
        

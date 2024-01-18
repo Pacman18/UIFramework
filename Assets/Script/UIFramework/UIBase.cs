@@ -80,7 +80,7 @@ namespace UIContent
         /// <returns></returns>
         #region FindChild UI element Method Wrapping 
 
-        protected TMPro.TextMeshProUGUI GetText(string childName, bool isTmp = true)
+        protected TMPro.TextMeshProUGUI GetTMPText(string childName)
         {
             TMPro.TextMeshProUGUI childresult;
 

@@ -33,7 +33,6 @@ public class UIManager : MonoBehaviour
     private Dictionary<UIPopupBase, List<UIPopupBase>> _pagePopupList = new Dictionary<UIPopupBase, List<UIPopupBase>>();
     private Dictionary<string, RectTransform> _stackCanvasList = new Dictionary<string, RectTransform>();
     private List<UIPopupBase> _popupList = new List<UIPopupBase>();   // 전체를 가리는 팝업단 관리 ( 판매완료 , 업그레이드 완료 정보등 )
-    private UIPopupBase _frontPopup = null;
 
     // 3D Uniq UI 인덱스 관리용 
     private int _uniqIndex = 0;
@@ -616,17 +615,6 @@ public class UIManager : MonoBehaviour
 
     private T CreatePopupUI<T>(string folder, UIData data = null, UIPopupBase.PopupType type = UIPopupBase.PopupType.POP_UP, bool preOption = false) where T : UIPopupBase
     {
-        // SpriteLoad;
-
-        if(type == UIPopupBase.PopupType.FRONT)
-        {
-            if (_frontPopup)
-            {
-                _accFrontUI++;
-                return null;
-            }               
-        }
-
         T bundlePopup = null;
 
         bundlePopup = GetPoolUI<T>();
@@ -1150,8 +1138,7 @@ public class UIManager : MonoBehaviour
                 break;
             case UIPopupBase.PopupType.FRONT:
                 popup.transform.SetParent(FrontUI, false);
-                _frontPopup = popup;
-                _accFrontUI++;           
+                _popupList.Add(popup);
                 break;
        
         }
@@ -1159,7 +1146,6 @@ public class UIManager : MonoBehaviour
         popup.transform.SetAsLastSibling();
     }
 
-    private int _accFrontUI = 0;
 
     /// <summary>
     ///  스택 팝업이있으면 스택을 지우고 없으면 베이스를 지운다     
@@ -1445,52 +1431,8 @@ public class UIManager : MonoBehaviour
             var toastUI = CreateFrontUI<ToastMessageUI>();
             toastUI.SetUIData(data);
             _waitingToast = true;
-
-            //Debug.Log("Show Toast Message : " + _toastQueueUI.Count);
         }
-
-
-        /*if(Input.GetKeyDown(KeyCode.I))
-        {
-            var ui = UIManager.i.GetPopComponent<DialogBox>();
-
-            if (ui == null)
-                ui = UIManager.i.CreatePopupUI<DialogBox>();
-
-            ui.StartShowIndex(1, 2);
-        }
-
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            var ui = UIManager.i.GetPopComponent<DialogBox>();
-
-            if (ui == null)
-                ui = UIManager.i.CreatePopupUI<DialogBox>();
-
-            ui.StartShowIndex(3, 6);
-        }
-
-        if (Input.GetKeyDown(KeyCode.P))
-        {
-            var ui = UIManager.i.GetPopComponent<DialogBox>();
-
-            if (ui == null)
-                ui = UIManager.i.CreatePopupUI<DialogBox>();
-
-            ui.StartShowIndex(7, 13);
-        }*/
-    }
-
-    public void RemoveFrontPopup()
-    {
-        _accFrontUI--;
-
-        if(_frontPopup && _accFrontUI < 1)
-            Destroy(_frontPopup.gameObject);
-
-        if (_accFrontUI < 0)
-            _accFrontUI = 0;
-    }
+    }  
 
     public void ClearGameUI()
     {
@@ -1530,9 +1472,9 @@ public class UIManager : MonoBehaviour
 
     #region Test
 
-    void OnGUI()
+    /*void OnGUI()
     {
-        /*if (GUI.Button(new Rect(0, 0, 100, 100), "ToastMessage"))
+        if (GUI.Button(new Rect(0, 0, 100, 100), "ToastMessage"))
         {
             UIManager.i.Toast("test :" + UnityEngine.Random.Range(0, 10));
         }
@@ -1551,8 +1493,8 @@ public class UIManager : MonoBehaviour
         {
 
 
-        }*/
-    }
+        }
+    }*/
     #endregion
 }
 
@@ -1574,12 +1516,31 @@ public static class UIExtension
 
     static public void StartLoading(this MonoBehaviour obj)
     {
-        UIManager.i.CreatePopupUI<UILoadingProgress>(null, UIPopupBase.PopupType.FRONT);
+        UILoadingProgress loadpop = UIManager.i.GetPopComponent<UILoadingProgress>();
+
+        if (loadpop == null)
+            UIManager.i.CreatePopupUI<UILoadingProgress>(null, UIPopupBase.PopupType.FRONT);
+        else
+        {
+            var uidata = UIManager.i.GetUIData<UILoadingProgressData>();
+            uidata.AddCount();
+        }
+
     }
 
     static public void LoadComplete(this MonoBehaviour obj)
     {
-        UIManager.i.RemoveFrontPopup();
+        var uidata = UIManager.i.GetUIData<UILoadingProgressData>();
+
+        if (uidata == null)
+            return;
+
+        uidata.ReduceCount();
+
+        Debug.Log("Loading Count : " + uidata.WaitingCount);
+
+        if (uidata.WaitingCount < 1)
+            UIManager.i.RemovePopup<UILoadingProgress>();
     }
 
     static public void PrevPopup(this MonoBehaviour obj)
@@ -1607,9 +1568,6 @@ public static class UIExtension
         var data = new ToastUIData();
         data.Message = text;
         UIManager.i.AddToastMessage(data);
-
-        //var message =  UIManager.i.CreateGameUI<ToastMessageUI>();
-        //message.SetUIData(text);
     }
 
 }
