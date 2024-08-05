@@ -1,20 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
 namespace UIContent
 { 
     public class UITestStackPage : UIPopupBase
     {
-        private TMPro.TextMeshProUGUI _titleText;
+        private Text _titleText;
 
 
         void Awake()
         {
             RegistAllButtonOnClickEvent();
-            _titleText = GetTMPText("Text_Title");
+            _titleText = GetText("Text_Title");
         }
 
        

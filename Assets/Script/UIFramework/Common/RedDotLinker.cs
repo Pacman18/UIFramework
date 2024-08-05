@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 namespace UIContent
 {
     public class RedDotLinker : MonoBehaviour
     {
         [SerializeField]
-        private TextMeshProUGUI _countText;
+        private Text _countText;
 
         [SerializeField]
         private Image _redDotImg;

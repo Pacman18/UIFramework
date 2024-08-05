@@ -11,12 +11,12 @@ namespace UIContent
     {
         private Button _leftButton;
         private Button _rightButton;
-        private TMPro.TextMeshProUGUI _titleText;
+        private Text _titleText;
 
         void Awake()
         {
             RegistAllButtonOnClickEvent();
-            _titleText = GetTMPText("Text_Title");
+            _titleText = GetText("Text_Title");
         }        
 
         public override void SetUIData(UIData data)
