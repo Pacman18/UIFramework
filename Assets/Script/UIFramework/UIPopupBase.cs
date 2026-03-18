@@ -17,6 +17,18 @@ public class UIPopupBase : UIBase
         TRADE_CONFIRM_CANCEL = 199, // 서버 진행이후
     };
 
+    private UnityAction<UIPopupBase> _closedPopCallback;
+    private System.Func<UIPopupBase, UIData> _getDataCallback;
+
+    public UnityAction<UIPopupBase> ClosedCallback
+    {
+        set { _closedPopCallback = value; }
+    }
+    
+    public System.Func<UIPopupBase, UIData> GetDataCallback
+    {
+        set { _getDataCallback = value; }
+    }
 
     [HideInInspector]
     public string Name = "";
@@ -180,7 +192,7 @@ public class UIPopupBase : UIBase
 
     public UIData GetData()
     {
-        return UIManager.i.GetUIData(this);
+        return _getDataCallback?.Invoke(this);
     }
 
     protected void SetDarkBack()
@@ -287,12 +299,12 @@ public class UIPopupBase : UIBase
         if (TweenCallback != null)
             TweenCallback.Invoke();
 
-        UIManager.i.RemoveTopPopup();
+        _closedPopCallback?.Invoke(this);
     }
 
     public override void Close()
     {
-        UIManager.i.RemovePopup(this);
+        _closedPopCallback?.Invoke(this);
     }
 
     #endregion

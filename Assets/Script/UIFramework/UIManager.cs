@@ -279,8 +279,9 @@ public class UIManager : MonoBehaviour
         if (_hudManager != null)
             return;
 
-        HUD hudManager = Instantiate(Resources.Load<GameObject>("Prefab/UI/HUD"),transform).GetComponent<HUD>();
-        _hudManager = hudManager;
+        HUD hudComp = Instantiate(Resources.Load<GameObject>("Prefab/UI/HUD"),transform).GetComponent<HUD>();
+        hudComp.UIClosedCallback = RemoveHUDUI;
+        _hudManager = hudComp;
 
         _hudManager.transform.SetSiblingIndex(2);
         _hudManager.transform.localPosition = _hudManager.transform.localPosition + Vector3.forward * 800;
@@ -456,6 +457,8 @@ public class UIManager : MonoBehaviour
 
         obj.transform.SetParent(WorldUI, false);
         T callUI = obj.GetComponent<T>();
+
+        callUI.UIClosedCallback = RemoveGameUI;
 
         _inGameUIList.Add(callUI);
 
@@ -642,6 +645,8 @@ public class UIManager : MonoBehaviour
 
             bundlePopup = obj.GetComponent<T>();
             bundlePopup.name = loadpopname;
+            bundlePopup.ClosedCallback = RemovePopup;
+            bundlePopup.GetDataCallback = GetUIData;
         }
 
         if (bundlePopup == null)

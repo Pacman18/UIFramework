@@ -43,6 +43,12 @@ namespace UIContent
 
         protected Graphic[] _tempGraphic = null;
 
+        private UnityAction<UIBase> _closedCallback;
+
+        public UnityAction<UIBase> UIClosedCallback
+        {
+            set { _closedCallback = value; }
+        }
         
 
         // UI Create가 된 이후 세팅되는 함수 
@@ -492,8 +498,7 @@ namespace UIContent
 
         public virtual void Close()
         {
-            UIManager.i.RemoveGameUI(this);
-            UIManager.i.Hud.RemoveHUDUI(this);
+            _closedCallback?.Invoke(this);
         }
 
 
